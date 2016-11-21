@@ -1,26 +1,26 @@
 (ns daily-programmer.20161121_easy.core
   (:use [clojure.string :only [split-lines]]))
 
-(def wire-rules-m {"white" {:allowed #{} :disallowed #{"white" "black"}}
-                   "red" {:allowed #{"green"} :disallowed #{}}
-                   "black" {:allowed #{} :disallowed #{"white" "green" "orange"}}
-                   "orange" {:allowed #{"red" "black"} :disallowed #{}}
-                   "green" {:allowed #{"orange" "white"} :disallowed #{}}
-                   "purple" {:allowed #{} :disallowed #{"purple" "green" "orange" "white"}}})
+(def wire-rules-m {"white" {:to-cut #{} :not-to-cut #{"white" "black"}}
+                   "red" {:to-cut #{"green"} :not-to-cut #{}}
+                   "black" {:to-cut #{} :not-to-cut #{"white" "green" "orange"}}
+                   "orange" {:to-cut #{"red" "black"} :not-to-cut #{}}
+                   "green" {:to-cut #{"orange" "white"} :not-to-cut #{}}
+                   "purple" {:to-cut #{} :not-to-cut #{"purple" "green" "orange" "white"}}})
 
-(defn check [wire & [{:keys [allowed disallowed]} rules]]
+(defn can-cut? [wire & [{:keys [to-cut not-to-cut]} rules]]
   (and
-   (or (empty? allowed) (contains? allowed wire))
-   (or (empty? disallowed) (not (contains? disallowed wire)))))
+   (or (empty? to-cut) (contains? to-cut wire))
+   (or (empty? not-to-cut) (not (contains? not-to-cut wire)))))
 
-(defn try-defuse
+(defn defuse
   ([wires]
-   (try-defuse wires {:allowed #{}, :disallowed #{}}))
+   (defuse wires {:to-cut #{}, :not-to-cut #{}}))
 
   ([[wire & others] rules]
-   (let [cut (check wire rules)]
+   (let [cut (can-cut? wire rules)]
      (if (nil? others)
        cut
        (and cut (recur others (get wire-rules-m wire)))))))
 
-(println (if (try-defuse (split-lines (slurp *in*))) "Bomb defused" "Boom"))
+(println (if (defuse (split-lines (slurp *in*))) "Bomb defused" "Boom"))
