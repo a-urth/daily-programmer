@@ -14,4 +14,4 @@
 (defn find-suitable [[goldi & other]]
   (keep-indexed #(if (suitable? goldi %2) (inc %1)) other))
 
-(println (find-suitable (read-input "input")))
+(println (find-suitable (read-input *in*)))

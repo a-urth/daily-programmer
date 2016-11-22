@@ -21,6 +21,6 @@
    (let [cut (can-cut? wire rules)]
      (if (nil? others)
        cut
-       (and cut (recur others (get wire-rules-m wire)))))))
+       (and cut (recur others (wire-rules-m wire)))))))
 
 (println (if (defuse (split-lines (slurp *in*))) "Bomb defused" "Boom"))
