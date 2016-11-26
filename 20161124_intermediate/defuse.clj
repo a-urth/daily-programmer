@@ -15,12 +15,11 @@
    (defuse wires :s0))
 
   ([[wire & others] cur-step]
-   (let [cur-rules (wire-rules cur-step)]
-     (if-let [next-step (cur-rules wire)]
-       (if (end? next-step)
-         true
-         (recur others next-step))
-       false))))
+   (let [next-step ((wire-rules cur-step) wire)]
+     (condp = next-step
+       :exit true
+       nil false
+       (recur others next-step)))))
 
 (defn defuse-bomb [i wires]
   (println
@@ -42,16 +41,15 @@
   ([wires-m step]
    (if (end? step)
      (no-wires-left? wires-m)
-     (loop [[[wire next-step] & other] (vec (wire-rules step))
-            cur-m wires-m]
+     (loop [[[wire next-step] & other] (vec (wire-rules step))]
        (if (nil? wire)
          false
-         (let [wire-n (cur-m wire)]
+         (let [wire-n (wires-m wire)]
            (if (zero? wire-n)
-             (recur other cur-m)
-             (if (defusable? (assoc cur-m wire (dec wire-n)) next-step)
+             (recur other)
+             (if (defusable? (assoc wires-m wire (dec wire-n)) next-step)
                true
-               (recur other cur-m)))))))))
+               (recur other)))))))))
 
 (defn check-bomb [i wires]
   (println
