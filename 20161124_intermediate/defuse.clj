@@ -41,15 +41,15 @@
   ([wires-m step]
    (if (end? step)
      (no-wires-left? wires-m)
-     (loop [[[wire next-step] & other] (vec (wire-rules step))]
+     (loop [[[wire next-step] & other] (seq (wire-rules step))]
        (if (nil? wire)
          false
          (let [wire-n (wires-m wire)]
-           (if (zero? wire-n)
-             (recur other)
-             (if (defusable? (assoc wires-m wire (dec wire-n)) next-step)
-               true
-               (recur other)))))))))
+           (if (and
+                (not (zero? wire-n))
+                (defusable? (assoc wires-m wire (dec wire-n)) next-step))
+             true
+             (recur other))))))))
 
 (defn check-bomb [i wires]
   (println
